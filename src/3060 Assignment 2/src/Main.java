@@ -96,6 +96,8 @@ public class Main {
                                   //Checks for start of Left/Right tile
                                   if (Math.abs(currentRow - selectedRow) == 1)
                                   {
+                                      //Check for left tile
+
                                       if (IsNeighbourValid(selectedRow, selectedColumn + 1))
                                       {
                                           if (datas[selectedColumn+1][selectedRow] == 0 && IsNeighbourValid(currentRow, currentColumn + 1))
@@ -106,8 +108,45 @@ public class Main {
                                               }
                                           }
                                       }
-                                      //Check for left tile
                                       //Check for right tile
+                                      if (IsNeighbourValid(selectedRow, selectedColumn - 1))
+                                      {
+                                          if (datas[selectedColumn - 1][selectedRow] == 0 && IsNeighbourValid(currentRow, currentColumn - 1))
+                                          {
+                                              if (datas[currentColumn - 1][currentRow] == 0)
+                                              {
+                                                  right2Tiles++;
+                                              }
+                                          }
+                                      }
+                                  }
+
+                                  if (Math.abs(currentColumn - selectedColumn) == 1)
+                                  {
+                                      //Check for bottom tile
+
+                                      if (IsNeighbourValid(selectedRow + 1, selectedColumn))
+                                      {
+                                          if (datas[selectedColumn][selectedRow + 1] == 0 && IsNeighbourValid(currentRow + 1, currentColumn))
+                                          {
+                                              if (datas[currentColumn][currentRow + 1] == 0)
+                                              {
+                                                  top2Tiles++;
+                                              }
+                                          }
+                                      }
+
+                                      //Check for top tile
+                                      if (IsNeighbourValid(selectedRow - 1, selectedColumn))
+                                      {
+                                          if (datas[selectedColumn][selectedRow - 1] == 0 && IsNeighbourValid(currentRow - 1, currentColumn))
+                                          {
+                                              if (datas[currentColumn][currentRow - 1] == 0)
+                                              {
+                                                  bottom2Tile++;
+                                              }
+                                          }
+                                      }
                                   }
                           }
                           //Checks if the neighbour is black
@@ -119,13 +158,6 @@ public class Main {
                                   //Check for top tile
                                   //Check for bottom tile
                               }
-                              /*
-                                i-1.j-1    i-1,j  i-1,j+1
-                                i,j-1      i,j     i,j+1
-                                i+1,j-1    i+1,j   i+1,j+1
-
-                               */
-
 
                           }
                       }
@@ -134,6 +166,9 @@ public class Main {
                 }
             }
         }
+        System.out.println("bottom2tiles: " + bottom2Tile);
+        System.out.println("top2tiles: " + top2Tiles);
+        System.out.println("right2tiles: " + right2Tiles);
         System.out.println("left2tiles: " + left2Tiles);
     }
 
