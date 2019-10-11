@@ -14,10 +14,10 @@ public class Main {
 
     static BufferedImage _img = null;
 
-    static String _path = "C:\\Users\\spark\\Documents\\Assignment2\\Assignment2_Images\\";
-    static String _csvFilePath = "C:\\Users\\spark\\Documents\\Assignment2\\CSV\\";
+    static String _path = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\Doodles\\";
+    static String _csvFilePath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\CSV\\";
 
-    static String _csvPath = "C:\\Users\\spark\\Documents\\Assignment2\\TestDirectory\\40178464_Banana_01.csv";
+    static String _csvPath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\TestDirectory\\40178464_Test_01.csv";
 
     private static final int GRID_SIZE = 50;
 
@@ -27,7 +27,7 @@ public class Main {
         //System.out.println("Enter the CSV Directory: ");
         int[][] csvData =  LoadCsvData(_csvPath);
         PrintArray2D(csvData);
-        PrintLabelIndex(_csvPath.split("\\\\")[6]);
+        PrintLabelIndex(_csvPath.split("\\\\")[7]);
         System.out.println("nr_pix: " + BlackPixelCount(csvData));
         System.out.println("height: " + Height(csvData));
         System.out.println("width: " + Width(csvData));
@@ -179,6 +179,8 @@ public class Main {
         return numberOfRows;
     }
 
+
+    //WORKS
     private static double Span(int[][] data)
     {
 
@@ -191,17 +193,17 @@ public class Main {
                 boolean isBlack = data[columnIndex][rowIndex] == 1;
                 if (isBlack)
                 {
-                    blackPixelData.add(new int[] {columnIndex, rowIndex});
+                    blackPixelData.add(new int[] {rowIndex, columnIndex});
                 }
             }
         }
 
-        for (int[] pixel : blackPixelData)
+        for (int i = 0; i < blackPixelData.size(); i++)
         {
-            for (int i = 0; i < blackPixelData.size(); i++)
+            for (int j = 0; j < blackPixelData.size(); j++)
             {
-                double horizontalSq = Math.pow(pixel[1] - blackPixelData.get(i)[1], 2);
-                double verticalSq = Math.pow(pixel[2] - blackPixelData.get(i)[2], 2);
+                double horizontalSq = Math.pow(Math.abs(blackPixelData.get(i)[0] - blackPixelData.get(j)[0]) + 1, 2);
+                double verticalSq = Math.pow(Math.abs(blackPixelData.get(i)[1] - blackPixelData.get(j)[1]) + 1, 2);
                 double distance = Math.sqrt(horizontalSq + verticalSq);
                 euclideanDistance = distance > euclideanDistance ? distance : euclideanDistance;
             }
