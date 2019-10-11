@@ -17,25 +17,26 @@ public class Main {
     static String _path = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\Doodles\\";
     static String _csvFilePath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\CSV\\";
 
-    static String _csvPath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\TestDirectory\\40178464_Test_01.csv";
+    static String _testPath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\TestDirectory\\40178464_Test_02.jpg";
+    static String _csvPath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\TestDirectory\\40178464_Test_02.csv";
 
     private static final int GRID_SIZE = 50;
 
     public static void main(String[] args) throws IOException
     {
-
+        //ConvertToCsv(_testPath);
         //System.out.println("Enter the CSV Directory: ");
         int[][] csvData =  LoadCsvData(_csvPath);
         PrintArray2D(csvData);
-        PrintLabelIndex(_csvPath.split("\\\\")[7]);
-        System.out.println("nr_pix: " + BlackPixelCount(csvData));
-        System.out.println("height: " + Height(csvData));
-        System.out.println("width: " + Width(csvData));
-        System.out.println("span: " + Span(csvData));
-        System.out.println("rows_with_5: " + RowsWithFivePlus(csvData));
-        System.out.println("cols_with_5: " + ColumnsWithFivePlus(csvData));
-        GetPixelNeighbours(csvData);
-
+//        PrintLabelIndex(_csvPath.split("\\\\")[7]);
+//        System.out.println("nr_pix: " + BlackPixelCount(csvData));
+//        System.out.println("height: " + Height(csvData));
+//        System.out.println("width: " + Width(csvData));
+//        System.out.println("span: " + Span(csvData));
+//        System.out.println("rows_with_5: " + RowsWithFivePlus(csvData));
+//        System.out.println("cols_with_5: " + ColumnsWithFivePlus(csvData));
+//        GetPixelNeighbours(csvData);
+        CountTwoTiles(csvData);
     }
 
 
@@ -50,7 +51,7 @@ public class Main {
             String[] data = row.split("\t");
             for (int i = 0; i < data.length; i++)
             {
-                datas[columnIndex][i] = Integer.parseInt(data[i]);
+                datas[i][columnIndex] = Integer.parseInt(data[i]);
             }
             columnIndex++;
         }
@@ -70,24 +71,77 @@ public class Main {
         }
     }
 
-
-
-    /*
-        0   1   0
-        0   0   0
-        1   1   1
-     */
-
     private static void CountTwoTiles(int[][] datas)
     {
         int left2Tiles = 0, right2Tiles = 0, top2Tiles = 0, bottom2Tile = 0;
-        for (int rowIndex = 0; rowIndex < GRID_SIZE; rowIndex++)
+        List<int[]> blackPixels = GetBlackPixelIndexes(datas);
+        int selectedRow = 0, selectedColumn = 0;
+        for (int[] pixel : blackPixels)
         {
-            for (int columnIndex = 0; columnIndex < GRID_SIZE; columnIndex++)
+            selectedRow = pixel[0]; selectedColumn = pixel[1];
+            for (int currentRow = selectedRow - 1; currentRow <= selectedRow + 1; currentRow++)
             {
+                for (int currentColumn = selectedColumn - 1; currentColumn <= selectedColumn + 1; currentColumn++)
+                {
+                  if (IsNotDiagonalNeighbour(selectedRow, selectedColumn,
+                          currentRow, currentColumn))
+                  {
+                      if (IsNeighbourValid(currentRow, currentColumn))
+                      {
 
+                          if (currentRow != selectedRow || currentColumn != selectedColumn)
+                          {
+                              if (datas[currentColumn][currentRow] == 1)
+                              {
+                                  //Checks for start of Left/Right tile
+                                  if (Math.abs(currentRow - selectedRow) == 1)
+                                  {
+                                      if (IsNeighbourValid(selectedRow, selectedColumn + 1))
+                                      {
+                                          if (datas[selectedColumn+1][selectedRow] == 0 && IsNeighbourValid(currentRow, currentColumn + 1))
+                                          {
+                                              if (datas[currentColumn + 1][currentRow] == 0)
+                                              {
+                                                    left2Tiles++;
+                                              }
+                                          }
+                                      }
+                                      //Check for left tile
+                                      //Check for right tile
+                                  }
+                          }
+                          //Checks if the neighbour is black
+
+
+                              //Checks for start of Top/Bottom tile
+                              if (Math.abs(currentColumn - selectedColumn) == 1)
+                              {
+                                  //Check for top tile
+                                  //Check for bottom tile
+                              }
+                              /*
+                                i-1.j-1    i-1,j  i-1,j+1
+                                i,j-1      i,j     i,j+1
+                                i+1,j-1    i+1,j   i+1,j+1
+
+                               */
+
+
+                          }
+                      }
+                  }
+
+                }
             }
         }
+        System.out.println("left2tiles: " + left2Tiles);
+    }
+
+    private static boolean IsNotDiagonalNeighbour(int currentRow, int currentColumn,
+                                                  int checkedRow, int checkedColumn)
+    {
+        return !(Math.abs(currentRow - checkedRow) > 0)
+                || !(Math.abs(currentColumn - checkedColumn) > 0);
     }
 
     private static int GetPixelNeighbours(int[][] datas)
@@ -185,18 +239,7 @@ public class Main {
     {
 
         double euclideanDistance = 0;
-        List<int[]> blackPixelData = new ArrayList<>();
-        for (int rowIndex = 0; rowIndex < GRID_SIZE; rowIndex++)
-        {
-            for (int columnIndex = 0; columnIndex < GRID_SIZE; columnIndex++)
-            {
-                boolean isBlack = data[columnIndex][rowIndex] == 1;
-                if (isBlack)
-                {
-                    blackPixelData.add(new int[] {rowIndex, columnIndex});
-                }
-            }
-        }
+        List<int[]> blackPixelData = GetBlackPixelIndexes(data);
 
         for (int i = 0; i < blackPixelData.size(); i++)
         {
@@ -209,6 +252,23 @@ public class Main {
             }
         }
         return euclideanDistance;
+    }
+
+    private static List<int[]> GetBlackPixelIndexes(int[][] data)
+    {
+        List<int[]> blackPixelData = new ArrayList<>();
+        for (int rowIndex = 0; rowIndex < GRID_SIZE; rowIndex++)
+        {
+            for (int columnIndex = 0; columnIndex < GRID_SIZE; columnIndex++)
+            {
+                boolean isBlack = data[columnIndex][rowIndex] == 1;
+                if (isBlack)
+                {
+                    blackPixelData.add(new int[] {rowIndex, columnIndex});
+                }
+            }
+        }
+        return blackPixelData;
     }
 
 

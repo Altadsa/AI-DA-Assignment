@@ -15,12 +15,19 @@
       </list>
     </option>
   </component>
+  <component name="JsFlowSettings">
+    <service-enabled>true</service-enabled>
+    <exe-path />
+    <other-services-enabled>true</other-services-enabled>
+    <auto-save>true</auto-save>
+  </component>
   <component name="ProjectId" id="1RjQOJ4yHirrU9zjOZbkkgBicdc" />
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="extract.method.default.visibility" value="private" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Java" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -58,7 +65,8 @@
       <workItem from="1570526568406" duration="2258000" />
       <workItem from="1570780811593" duration="155000" />
       <workItem from="1570780988834" duration="164000" />
-      <workItem from="1570781391055" duration="2315000" />
+      <workItem from="1570781391055" duration="5385000" />
+      <workItem from="1570791839846" duration="4572000" />
     </task>
     <servers />
   </component>
@@ -70,19 +78,24 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Main.java</url>
-          <line>325</line>
+          <line>385</line>
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Main.java</url>
-          <line>200</line>
+          <line>243</line>
           <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Main.java</url>
+          <line>93</line>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
-        <watch expression="blackPixelData.get(2)" />
+        <watch expression="blackPixels" />
       </configuration>
     </watches-manager>
   </component>
