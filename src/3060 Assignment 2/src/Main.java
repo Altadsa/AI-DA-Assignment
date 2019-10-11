@@ -148,17 +148,7 @@ public class Main {
                                           }
                                       }
                                   }
-                          }
-                          //Checks if the neighbour is black
-
-
-                              //Checks for start of Top/Bottom tile
-                              if (Math.abs(currentColumn - selectedColumn) == 1)
-                              {
-                                  //Check for top tile
-                                  //Check for bottom tile
                               }
-
                           }
                       }
                   }
@@ -166,10 +156,16 @@ public class Main {
                 }
             }
         }
-        System.out.println("bottom2tiles: " + bottom2Tile);
-        System.out.println("top2tiles: " + top2Tiles);
+
         System.out.println("right2tiles: " + right2Tiles);
         System.out.println("left2tiles: " + left2Tiles);
+        System.out.println("verticalness: " + (double)(left2Tiles + right2Tiles) / BlackPixelCount(datas));
+
+
+        System.out.println("bottom2tiles: " + bottom2Tile);
+        System.out.println("top2tiles: " + top2Tiles);
+        System.out.println("horizontalness: " + (double)(top2Tiles+bottom2Tile) / BlackPixelCount(datas));
+
     }
 
     private static boolean IsNotDiagonalNeighbour(int currentRow, int currentColumn,
