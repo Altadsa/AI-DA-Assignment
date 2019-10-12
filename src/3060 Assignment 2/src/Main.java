@@ -14,7 +14,7 @@ public class Main {
 
     static BufferedImage _img = null;
 
-    static String _path = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\Doodles\\";
+    static String _imgPath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\Doodles\\";
     static String _csvFilePath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\CSV\\";
 
     static String _testPath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\TestDirectory\\40178464_Test_02.jpg";
@@ -22,12 +22,37 @@ public class Main {
 
     private static final int GRID_SIZE = 50;
 
+    static final String FEATURES_HEADINGS = "label\tindex\tnr_pix\theight\twidth\tspan\trows_with_5\tcols_with_5\tneigh1\tneigh5"
+            + "\tleft2tile\tright2tile\tverticalness\ttop2tile\tbottom2tile\thorizontalness\tnewlabel1\tnewlabel2\tnr_regions\t"
+            + "nr_eyes\thollowness\tnewlabel3";
+
+    static ArrayList<DoodleFeature> _doodleFeatures = new ArrayList<>();
+
     public static void main(String[] args) throws IOException
     {
+        Stream<Path> walk = Files.walk(Paths.get(_csvFilePath));
+
+        List<String> results = walk.filter(Files::isRegularFile).map(x -> x.toString()).collect(Collectors.toList());
+        for (String result : results)
+        {
+            var doodleFeature = new DoodleFeature(LoadCsvData(result), result);
+            _doodleFeatures.add(doodleFeature);
+        }
+        String featuresName = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\40178464_features.csv";
+        FileWriter fos = new FileWriter(featuresName);
+        PrintWriter dos = new PrintWriter(fos);
+        dos.println(FEATURES_HEADINGS);
+        for (int i = 0; i < _doodleFeatures.size(); i++)
+        {
+            dos.println(_doodleFeatures.get(i).GetDoodleFeatures());
+        }
+        dos.close();
+        fos.close();
+
         //ConvertToCsv(_testPath);
         //System.out.println("Enter the CSV Directory: ");
-        int[][] csvData =  LoadCsvData(_csvPath);
-        PrintArray2D(csvData);
+        //int[][] csvData =  LoadCsvData(_csvPath);
+        //PrintArray2D(csvData);
 //        PrintLabelIndex(_csvPath.split("\\\\")[7]);
 //        System.out.println("nr_pix: " + BlackPixelCount(csvData));
 //        System.out.println("height: " + Height(csvData));
@@ -37,27 +62,37 @@ public class Main {
 //        System.out.println("cols_with_5: " + ColumnsWithFivePlus(csvData));
 //        GetPixelNeighbours(csvData);
         //CountTwoTiles(csvData);
-        CountRegions(csvData);
+        //CountRegions(csvData);
+        //CountEyes(csvData);
     }
 
 
-    private static int[][] LoadCsvData(String filePath) throws IOException
+    private static int[][] LoadCsvData(String filePath)
     {
-        BufferedReader csvReader = new BufferedReader(new FileReader(filePath));
-        String row;
-        int columnIndex = 0;
-        int[][] datas = new int[GRID_SIZE][GRID_SIZE];
-        while ((row = csvReader.readLine()) != null)
+        try
         {
-            String[] data = row.split("\t");
-            for (int i = 0; i < data.length; i++)
+            BufferedReader csvReader = new BufferedReader(new FileReader(filePath));
+            String row;
+            int columnIndex = 0;
+            int[][] datas = new int[GRID_SIZE][GRID_SIZE];
+            while ((row = csvReader.readLine()) != null)
             {
-                datas[i][columnIndex] = Integer.parseInt(data[i]);
+                String[] data = row.split("\t");
+                for (int i = 0; i < data.length; i++)
+                {
+                    datas[i][columnIndex] = Integer.parseInt(data[i]);
+                }
+                columnIndex++;
             }
-            columnIndex++;
+            csvReader.close();
+            return datas;
         }
-        csvReader.close();
-        return datas;
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     private static void PrintArray2D(int[][] datas)
@@ -72,6 +107,36 @@ public class Main {
         }
     }
 
+    /*
+        Get all black pixels
+        If a pixel isn't marked
+            Check if there is a potential loop
+                if the check step is 3 or higher then begin checking if any neighbours are the src
+                    if so say so and inc eye count by 1
+     */
+    static int eyeCount = 0;
+    private static void CountEyes(int[][] data)
+    {
+        boolean[][] markedPixels = new boolean[GRID_SIZE][GRID_SIZE];
+
+        for (int rowIndex = 0; rowIndex < data.length; rowIndex++)
+        {
+            for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++)
+            {
+                boolean isBlack = data[columnIndex][rowIndex] == 1;
+                boolean isMarked = markedPixels[columnIndex][rowIndex];
+                if (isBlack && !isMarked)
+                {
+
+                }
+            }
+        }
+        System.out.println("nr_eyes: " + eyeCount);
+    }
+
+
+
+    //WORKS
     private static void CountRegions(int[][] data)
     {
         boolean[][] markedPixels = new boolean[GRID_SIZE][GRID_SIZE];
@@ -110,120 +175,6 @@ public class Main {
                 }
             }
         }
-    }
-
-    //WORKS
-    private static void CountTwoTiles(int[][] datas)
-    {
-        int left2Tiles = 0, right2Tiles = 0, top2Tiles = 0, bottom2Tile = 0;
-        List<int[]> blackPixels = GetBlackPixelIndexes(datas);
-        boolean[][] leftTiles = new boolean[GRID_SIZE][GRID_SIZE];
-        boolean[][] rightTiles = new boolean[GRID_SIZE][GRID_SIZE];
-        boolean[][] topTiles = new boolean[GRID_SIZE][GRID_SIZE];
-        boolean[][] bottomTiles = new boolean[GRID_SIZE][GRID_SIZE];
-        int selectedRow = 0, selectedColumn = 0;
-        for (int[] pixel : blackPixels)
-        {
-            selectedRow = pixel[0]; selectedColumn = pixel[1];
-            for (int currentRow = selectedRow - 1; currentRow <= selectedRow + 1; currentRow++)
-            {
-                for (int currentColumn = selectedColumn - 1; currentColumn <= selectedColumn + 1; currentColumn++)
-                {
-                  if (IsNotDiagonalNeighbour(selectedRow, selectedColumn,
-                          currentRow, currentColumn))
-                  {
-                      if (IsNeighbourValid(currentRow, currentColumn))
-                      {
-
-                          if (currentRow != selectedRow || currentColumn != selectedColumn)
-                          {
-                              if (datas[currentColumn][currentRow] == 1)
-                              {
-                                  //Checks for start of Left/Right tile
-                                  if (Math.abs(currentRow - selectedRow) == 1)
-                                  {
-                                      //Check for left tile
-                                      boolean leftTileMarked = leftTiles[selectedColumn][selectedRow] && leftTiles[currentColumn][currentRow];
-                                      if (IsNeighbourValid(selectedRow, selectedColumn + 1) && !leftTileMarked)
-                                      {
-                                          if (datas[selectedColumn+1][selectedRow] == 0 && IsNeighbourValid(currentRow, currentColumn + 1))
-                                          {
-                                              if (datas[currentColumn + 1][currentRow] == 0)
-                                              {
-                                                    left2Tiles++;
-                                                    leftTiles[selectedColumn][selectedRow] = true;
-                                                    leftTiles[currentColumn][currentRow] = true;
-                                              }
-                                          }
-                                      }
-
-                                      //Check for right tile
-                                      boolean rightTileMarked = rightTiles[selectedColumn][selectedRow] && rightTiles[currentColumn][currentRow];
-                                      if (IsNeighbourValid(selectedRow, selectedColumn - 1) && !rightTileMarked)
-                                      {
-                                          if (datas[selectedColumn - 1][selectedRow] == 0 && IsNeighbourValid(currentRow, currentColumn - 1))
-                                          {
-                                              if (datas[currentColumn - 1][currentRow] == 0)
-                                              {
-                                                  right2Tiles++;
-                                                  rightTiles[selectedColumn][selectedRow] = true;
-                                                  rightTiles[currentColumn][currentRow] = true;
-                                              }
-                                          }
-                                      }
-                                  }
-
-                                  if (Math.abs(currentColumn - selectedColumn) == 1)
-                                  {
-
-                                      //Check for bottom tile
-                                      boolean topTileMarked = topTiles[selectedColumn][selectedRow] && topTiles[currentColumn][currentRow];
-                                      if (IsNeighbourValid(selectedRow + 1, selectedColumn) & !topTileMarked)
-                                      {
-                                          if (datas[selectedColumn][selectedRow + 1] == 0 && IsNeighbourValid(currentRow + 1, currentColumn))
-                                          {
-                                              if (datas[currentColumn][currentRow + 1] == 0)
-                                              {
-                                                  top2Tiles++;
-                                                  topTiles[selectedColumn][selectedRow] = true;
-                                                  topTiles[currentColumn][currentRow] = true;
-                                              }
-                                          }
-                                      }
-
-                                      //Check for top tile
-                                      boolean bottomTileMarked = bottomTiles[selectedColumn][selectedRow] && bottomTiles[currentColumn][currentRow];
-                                      if (IsNeighbourValid(selectedRow - 1, selectedColumn) && !bottomTileMarked)
-                                      {
-                                          if (datas[selectedColumn][selectedRow - 1] == 0 && IsNeighbourValid(currentRow - 1, currentColumn))
-                                          {
-                                              if (datas[currentColumn][currentRow - 1] == 0)
-                                              {
-                                                  bottom2Tile++;
-                                                  bottomTiles[selectedColumn][selectedRow] = true;
-                                                  bottomTiles[currentColumn][currentRow] = true;
-                                              }
-                                          }
-                                      }
-                                  }
-                              }
-                          }
-                      }
-                  }
-
-                }
-            }
-        }
-
-        System.out.println("right2tiles: " + right2Tiles);
-        System.out.println("left2tiles: " + left2Tiles);
-        System.out.println("verticalness: " + (double)(left2Tiles + right2Tiles) / BlackPixelCount(datas));
-
-
-        System.out.println("bottom2tiles: " + bottom2Tile);
-        System.out.println("top2tiles: " + top2Tiles);
-        System.out.println("horizontalness: " + (double)(top2Tiles+bottom2Tile) / BlackPixelCount(datas));
-
     }
 
     private static boolean IsNotDiagonalNeighbour(int currentRow, int currentColumn,
@@ -298,13 +249,6 @@ public class Main {
         return numberOfColumns;
     }
 
-    private static void PrintLabelIndex(String fileName)
-    {
-        String[] name = fileName.split("_");
-        System.out.println("label: " + name[1]);
-        System.out.println("index: " + name[2]);
-    }
-
     //WORKS
     private static int RowsWithFivePlus(int[][] datas)
     {
@@ -360,48 +304,6 @@ public class Main {
         return blackPixelData;
     }
 
-
-    //WORKS
-    private static int Height(int[][] datas)
-    {
-        int topmost = -1, bottommost = -1;
-        for (int i = 0; i < GRID_SIZE; i++)
-        {
-            for (int j = 0; j < GRID_SIZE; j++)
-            {
-                  int pixelValue = datas[j][i];
-                  if (pixelValue == 1)
-                  {
-                      topmost = (topmost >= 0) ? topmost : i;
-                      bottommost = (i <= bottommost) ? bottommost : i;
-                  }
-            }
-        }
-        return Math.abs(bottommost - topmost) + 1;
-    }
-
-
-    //WORKS
-    private static int Width(int[][] datas)
-    {
-        int leftmost = GRID_SIZE, rightmost = - 1;
-        for (int i = 0; i < GRID_SIZE; i++)
-        {
-            for (int j = 0; j < GRID_SIZE; j++)
-            {
-                int pixelValue = datas[j][i];
-                if (pixelValue == 1)
-                {
-                    leftmost = j < leftmost ? j : leftmost;
-                    rightmost = j > rightmost ? j : rightmost;
-                }
-            }
-        }
-
-        return Math.abs(leftmost - rightmost) + 1;
-    }
-
-
     //WORKS
     private static int BlackPixelCount(int[][] datas)
     {
@@ -432,7 +334,7 @@ public class Main {
 
     private static void GenerateCsvFromFiles() throws IOException
     {
-        Stream<Path> walk = Files.walk(Paths.get(_path));
+        Stream<Path> walk = Files.walk(Paths.get(_imgPath));
 
         List<String> results = walk.filter(Files::isRegularFile).map(x -> x.toString()).collect(Collectors.toList());
         results.forEach(Main::ConvertToCsv);
