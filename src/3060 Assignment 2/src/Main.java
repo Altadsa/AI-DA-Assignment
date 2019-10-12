@@ -75,6 +75,10 @@ public class Main {
     {
         int left2Tiles = 0, right2Tiles = 0, top2Tiles = 0, bottom2Tile = 0;
         List<int[]> blackPixels = GetBlackPixelIndexes(datas);
+        boolean[][] leftTiles = new boolean[GRID_SIZE][GRID_SIZE];
+        boolean[][] rightTiles = new boolean[GRID_SIZE][GRID_SIZE];
+        boolean[][] topTiles = new boolean[GRID_SIZE][GRID_SIZE];
+        boolean[][] bottomTiles = new boolean[GRID_SIZE][GRID_SIZE];
         int selectedRow = 0, selectedColumn = 0;
         for (int[] pixel : blackPixels)
         {
@@ -97,25 +101,31 @@ public class Main {
                                   if (Math.abs(currentRow - selectedRow) == 1)
                                   {
                                       //Check for left tile
-
-                                      if (IsNeighbourValid(selectedRow, selectedColumn + 1))
+                                      boolean leftTileMarked = leftTiles[selectedColumn][selectedRow] && leftTiles[currentColumn][currentRow];
+                                      if (IsNeighbourValid(selectedRow, selectedColumn + 1) && !leftTileMarked)
                                       {
                                           if (datas[selectedColumn+1][selectedRow] == 0 && IsNeighbourValid(currentRow, currentColumn + 1))
                                           {
                                               if (datas[currentColumn + 1][currentRow] == 0)
                                               {
                                                     left2Tiles++;
+                                                    leftTiles[selectedColumn][selectedRow] = true;
+                                                    leftTiles[currentColumn][currentRow] = true;
                                               }
                                           }
                                       }
+
                                       //Check for right tile
-                                      if (IsNeighbourValid(selectedRow, selectedColumn - 1))
+                                      boolean rightTileMarked = rightTiles[selectedColumn][selectedRow] && rightTiles[currentColumn][currentRow];
+                                      if (IsNeighbourValid(selectedRow, selectedColumn - 1) && !rightTileMarked)
                                       {
                                           if (datas[selectedColumn - 1][selectedRow] == 0 && IsNeighbourValid(currentRow, currentColumn - 1))
                                           {
                                               if (datas[currentColumn - 1][currentRow] == 0)
                                               {
                                                   right2Tiles++;
+                                                  rightTiles[selectedColumn][selectedRow] = true;
+                                                  rightTiles[currentColumn][currentRow] = true;
                                               }
                                           }
                                       }
@@ -123,27 +133,33 @@ public class Main {
 
                                   if (Math.abs(currentColumn - selectedColumn) == 1)
                                   {
-                                      //Check for bottom tile
 
-                                      if (IsNeighbourValid(selectedRow + 1, selectedColumn))
+                                      //Check for bottom tile
+                                      boolean topTileMarked = topTiles[selectedColumn][selectedRow] && topTiles[currentColumn][currentRow];
+                                      if (IsNeighbourValid(selectedRow + 1, selectedColumn) & !topTileMarked)
                                       {
                                           if (datas[selectedColumn][selectedRow + 1] == 0 && IsNeighbourValid(currentRow + 1, currentColumn))
                                           {
                                               if (datas[currentColumn][currentRow + 1] == 0)
                                               {
                                                   top2Tiles++;
+                                                  topTiles[selectedColumn][selectedRow] = true;
+                                                  topTiles[currentColumn][currentRow] = true;
                                               }
                                           }
                                       }
 
                                       //Check for top tile
-                                      if (IsNeighbourValid(selectedRow - 1, selectedColumn))
+                                      boolean bottomTileMarked = bottomTiles[selectedColumn][selectedRow] && bottomTiles[currentColumn][currentRow];
+                                      if (IsNeighbourValid(selectedRow - 1, selectedColumn) && !bottomTileMarked)
                                       {
                                           if (datas[selectedColumn][selectedRow - 1] == 0 && IsNeighbourValid(currentRow - 1, currentColumn))
                                           {
                                               if (datas[currentColumn][currentRow - 1] == 0)
                                               {
                                                   bottom2Tile++;
+                                                  bottomTiles[selectedColumn][selectedRow] = true;
+                                                  bottomTiles[currentColumn][currentRow] = true;
                                               }
                                           }
                                       }
