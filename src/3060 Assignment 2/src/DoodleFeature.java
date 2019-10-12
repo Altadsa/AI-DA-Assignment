@@ -167,6 +167,24 @@ public class DoodleFeature
         return regionCount;
     }
 
+    private void CountCrosses()
+    {
+        boolean[][] markedPixels = new boolean[GRID_SIZE][GRID_SIZE];
+        int crossCount = 0;
+        for (int rowIndex = 0; rowIndex < data.length; rowIndex++)
+        {
+            for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++)
+            {
+                boolean isBlack = data[columnIndex][rowIndex] == 1;
+                boolean isMarked = markedPixels[columnIndex][rowIndex];
+                if (isBlack && !isMarked)
+                {
+
+                }
+            }
+        }
+    }
+
     private void MarkNeighbours(boolean[][] markedPixels, int currentRow, int currentColumn)
     {
         for (int rowIndex = currentRow - 1; rowIndex <= (currentRow + 1); rowIndex++)
@@ -185,6 +203,8 @@ public class DoodleFeature
             }
         }
     }
+
+
 
     private void CountTwoTiles()
     {
