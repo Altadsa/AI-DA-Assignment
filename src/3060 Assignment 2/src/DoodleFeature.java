@@ -87,17 +87,50 @@ public class DoodleFeature
         {
             for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++)
             {
-                boolean isBlack = data[columnIndex][rowIndex] == 0;
+                boolean isWhite = data[columnIndex][rowIndex] == 0;
                 boolean isMarked = markedPixels[columnIndex][rowIndex];
-                if (isBlack && !isMarked)
+                if (isWhite && !isMarked)
                 {
                     markedPixels[columnIndex][rowIndex] = true;
-                    MarkNeighbours(markedPixels, rowIndex, columnIndex, 0);
+                    MarkEyes(markedPixels, rowIndex, columnIndex);
                     eyeCount++;
                 }
             }
         }
         return eyeCount-1;
+    }
+
+    private void MarkEyes(boolean[][] markedPixels, int currentRow, int currentColumn)
+    {
+        for (int rowIndex = currentRow - 1; rowIndex <= (currentRow + 1); rowIndex++)
+        {
+            for (int columnIndex = currentColumn - 1; columnIndex <= (currentColumn + 1) ; columnIndex++)
+            {
+                if (IsNeighbourValid(rowIndex, columnIndex))
+                {
+                    boolean isMarked = markedPixels[columnIndex][rowIndex];
+                    boolean isWhite = data[columnIndex][rowIndex] == 0;
+                    if (!isMarked && isWhite)
+                    {
+                        if (!IsNotDiagonalNeighbour(currentRow, currentColumn, rowIndex, columnIndex))
+                        {
+                            int adjacentOne = data[currentColumn + (columnIndex - currentColumn)][currentRow];
+                            int adjacentTwo = data[currentColumn][currentRow + (rowIndex - currentRow)];
+                            if (adjacentOne != 1 && adjacentTwo != 1)
+                            {
+                                markedPixels[columnIndex][rowIndex] = true;
+                                MarkEyes(markedPixels, rowIndex, columnIndex);
+                            }
+                        }
+                        else
+                        {
+                            markedPixels[columnIndex][rowIndex] = true;
+                            MarkEyes(markedPixels, rowIndex, columnIndex);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private int CountRegions()
@@ -113,7 +146,7 @@ public class DoodleFeature
                 if (isBlack && !isMarked)
                 {
                     markedPixels[columnIndex][rowIndex] = true;
-                    MarkNeighbours(markedPixels, rowIndex, columnIndex, 1);
+                    MarkNeighbours(markedPixels, rowIndex, columnIndex);
                     regionCount++;
                 }
             }
@@ -121,7 +154,7 @@ public class DoodleFeature
         return regionCount;
     }
 
-    private void MarkNeighbours(boolean[][] markedPixels, int currentRow, int currentColumn, int pixelColor)
+    private void MarkNeighbours(boolean[][] markedPixels, int currentRow, int currentColumn)
     {
         for (int rowIndex = currentRow - 1; rowIndex <= (currentRow + 1); rowIndex++)
         {
@@ -130,10 +163,10 @@ public class DoodleFeature
                 if (IsNeighbourValid(rowIndex, columnIndex))
                 {
                     boolean isMarked = markedPixels[columnIndex][rowIndex];
-                    if (!isMarked && data[columnIndex][rowIndex] == pixelColor)
+                    if (!isMarked && data[columnIndex][rowIndex] == 1)
                     {
                         markedPixels[columnIndex][rowIndex] = true;
-                        MarkNeighbours(markedPixels, rowIndex, columnIndex, pixelColor);
+                        MarkNeighbours(markedPixels, rowIndex, columnIndex);
                     }
                 }
             }
