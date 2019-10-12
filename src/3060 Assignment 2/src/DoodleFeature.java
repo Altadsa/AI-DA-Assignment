@@ -1,4 +1,3 @@
-import java.awt.color.ICC_ProfileRGB;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -20,6 +19,8 @@ public class DoodleFeature
     int _top2tile = 0;
     int _bottom2tile = 0;
     double _horizontalness = 0;
+    int _nrEyes = 0;
+    double _hollowness = 0;
 
     public DoodleFeature(int[][] csvData, String filepath)
     {
@@ -34,6 +35,7 @@ public class DoodleFeature
         GetDoodleName();
         GetPixelNeighbours();
         CountTwoTiles();
+        CountEyes();
     }
 
     public String GetDoodleFeatures()
@@ -58,8 +60,8 @@ public class DoodleFeature
         features += "insert_feature\t";
         features += "insert_feature\t";
         features += CountRegions() + "\t";
-        features += CountEyes() + "\t";
-        features += "0.0\t";
+        features += _nrEyes + "\t";
+        features += _hollowness + "\t";
         features += "insert_feature\t";
 
         return features;
@@ -79,10 +81,11 @@ public class DoodleFeature
 
     }
 
-    private int CountEyes()
+    private void CountEyes()
     {
         boolean[][] markedPixels = new boolean[GRID_SIZE][GRID_SIZE];
         int eyeCount = 0;
+        ArrayList<Integer> whiteInEyes = new ArrayList<>();
         for (int rowIndex = 0; rowIndex < data.length; rowIndex++)
         {
             for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++)
@@ -92,16 +95,25 @@ public class DoodleFeature
                 if (isWhite && !isMarked)
                 {
                     markedPixels[columnIndex][rowIndex] = true;
-                    MarkEyes(markedPixels, rowIndex, columnIndex);
+                    whiteInEyes.add(MarkEyes(markedPixels, rowIndex, columnIndex));
                     eyeCount++;
                 }
             }
         }
-        return eyeCount-1;
+        _nrEyes = eyeCount-1;
+
+        whiteInEyes.remove(0);
+        int whitePixelCount = 0;
+        for (int i = 0; i < whiteInEyes.size(); i++)
+        {
+            whitePixelCount += whiteInEyes.get(i);
+        }
+        _hollowness = (double) whitePixelCount / NumberOfPixels();
     }
 
-    private void MarkEyes(boolean[][] markedPixels, int currentRow, int currentColumn)
+    private int MarkEyes(boolean[][] markedPixels, int currentRow, int currentColumn)
     {
+        int size = 1;
         for (int rowIndex = currentRow - 1; rowIndex <= (currentRow + 1); rowIndex++)
         {
             for (int columnIndex = currentColumn - 1; columnIndex <= (currentColumn + 1) ; columnIndex++)
@@ -119,18 +131,19 @@ public class DoodleFeature
                             if (adjacentOne != 1 && adjacentTwo != 1)
                             {
                                 markedPixels[columnIndex][rowIndex] = true;
-                                MarkEyes(markedPixels, rowIndex, columnIndex);
+                                size += MarkEyes(markedPixels, rowIndex, columnIndex);
                             }
                         }
                         else
                         {
                             markedPixels[columnIndex][rowIndex] = true;
-                            MarkEyes(markedPixels, rowIndex, columnIndex);
+                            size += MarkEyes(markedPixels, rowIndex, columnIndex);
                         }
                     }
                 }
             }
         }
+        return size;
     }
 
     private int CountRegions()
