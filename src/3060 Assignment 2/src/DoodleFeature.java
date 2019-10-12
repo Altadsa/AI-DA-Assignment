@@ -58,7 +58,7 @@ public class DoodleFeature
         features += "insert_feature\t";
         features += "insert_feature\t";
         features += CountRegions() + "\t";
-        features += "0\t";
+        features += CountEyes() + "\t";
         features += "0.0\t";
         features += "insert_feature\t";
 
@@ -79,6 +79,27 @@ public class DoodleFeature
 
     }
 
+    private int CountEyes()
+    {
+        boolean[][] markedPixels = new boolean[GRID_SIZE][GRID_SIZE];
+        int eyeCount = 0;
+        for (int rowIndex = 0; rowIndex < data.length; rowIndex++)
+        {
+            for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++)
+            {
+                boolean isBlack = data[columnIndex][rowIndex] == 0;
+                boolean isMarked = markedPixels[columnIndex][rowIndex];
+                if (isBlack && !isMarked)
+                {
+                    markedPixels[columnIndex][rowIndex] = true;
+                    MarkNeighbours(markedPixels, rowIndex, columnIndex, 0);
+                    eyeCount++;
+                }
+            }
+        }
+        return eyeCount-1;
+    }
+
     private int CountRegions()
     {
         boolean[][] markedPixels = new boolean[GRID_SIZE][GRID_SIZE];
@@ -92,7 +113,7 @@ public class DoodleFeature
                 if (isBlack && !isMarked)
                 {
                     markedPixels[columnIndex][rowIndex] = true;
-                    MarkNeighbours(markedPixels, rowIndex, columnIndex);
+                    MarkNeighbours(markedPixels, rowIndex, columnIndex, 1);
                     regionCount++;
                 }
             }
@@ -100,7 +121,7 @@ public class DoodleFeature
         return regionCount;
     }
 
-    private void MarkNeighbours(boolean[][] markedPixels, int currentRow, int currentColumn)
+    private void MarkNeighbours(boolean[][] markedPixels, int currentRow, int currentColumn, int pixelColor)
     {
         for (int rowIndex = currentRow - 1; rowIndex <= (currentRow + 1); rowIndex++)
         {
@@ -109,10 +130,10 @@ public class DoodleFeature
                 if (IsNeighbourValid(rowIndex, columnIndex))
                 {
                     boolean isMarked = markedPixels[columnIndex][rowIndex];
-                    if (!isMarked && data[columnIndex][rowIndex] == 1)
+                    if (!isMarked && data[columnIndex][rowIndex] == pixelColor)
                     {
                         markedPixels[columnIndex][rowIndex] = true;
-                        MarkNeighbours(markedPixels, rowIndex, columnIndex);
+                        MarkNeighbours(markedPixels, rowIndex, columnIndex, pixelColor);
                     }
                 }
             }
