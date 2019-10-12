@@ -36,7 +36,8 @@ public class Main {
 //        System.out.println("rows_with_5: " + RowsWithFivePlus(csvData));
 //        System.out.println("cols_with_5: " + ColumnsWithFivePlus(csvData));
 //        GetPixelNeighbours(csvData);
-        CountTwoTiles(csvData);
+        //CountTwoTiles(csvData);
+        CountRegions(csvData);
     }
 
 
@@ -71,6 +72,47 @@ public class Main {
         }
     }
 
+    private static void CountRegions(int[][] data)
+    {
+        boolean[][] markedPixels = new boolean[GRID_SIZE][GRID_SIZE];
+        int regionCount = 0;
+        for (int rowIndex = 0; rowIndex < data.length; rowIndex++)
+        {
+            for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++)
+            {
+                boolean isBlack = data[columnIndex][rowIndex] == 1;
+                boolean isMarked = markedPixels[columnIndex][rowIndex];
+                if (isBlack && !isMarked)
+                {
+                    markedPixels[columnIndex][rowIndex] = true;
+                    MarkNeighbours(data, markedPixels, rowIndex, columnIndex);
+                    regionCount++;
+                }
+            }
+        }
+        System.out.println("nr_regions: " + regionCount);
+    }
+
+    private static void MarkNeighbours(int[][] data, boolean[][] markedPixels, int currentRow, int currentColumn)
+    {
+        for (int rowIndex = currentRow - 1; rowIndex <= (currentRow + 1); rowIndex++)
+        {
+            for (int columnIndex = currentColumn - 1; columnIndex <= (currentColumn + 1) ; columnIndex++)
+            {
+                if (IsNeighbourValid(rowIndex, columnIndex))
+                {
+                    boolean isMarked = markedPixels[columnIndex][rowIndex];
+                    if (!isMarked && data[columnIndex][rowIndex] == 1)
+                    {
+                        markedPixels[columnIndex][rowIndex] = true;
+                        MarkNeighbours(data, markedPixels, rowIndex, columnIndex);
+                    }
+                }
+            }
+        }
+    }
+
+    //WORKS
     private static void CountTwoTiles(int[][] datas)
     {
         int left2Tiles = 0, right2Tiles = 0, top2Tiles = 0, bottom2Tile = 0;
