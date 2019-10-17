@@ -21,6 +21,7 @@ public class DoodleFeature
     double _horizontalness = 0;
     int _nrEyes = 0;
     double _hollowness = 0;
+    double _imageFill = 0;
 
     public DoodleFeature(int[][] csvData, String filepath)
     {
@@ -62,7 +63,7 @@ public class DoodleFeature
         features += CountRegions() + "\t";
         features += _nrEyes + "\t";
         features += _hollowness + "\t";
-        features += "insert_feature\t";
+        features += _imageFill + "\t";
 
         return features;
     }
@@ -102,6 +103,7 @@ public class DoodleFeature
         }
         _nrEyes = eyeCount-1;
 
+        int unusedArea = whiteInEyes.get(0);
         whiteInEyes.remove(0);
         int whitePixelCount = 0;
         for (int i = 0; i < whiteInEyes.size(); i++)
@@ -109,6 +111,7 @@ public class DoodleFeature
             whitePixelCount += whiteInEyes.get(i);
         }
         _hollowness = (double) whitePixelCount / NumberOfPixels();
+        _imageFill = (double) (whitePixelCount + NumberOfPixels()) / unusedArea;
     }
 
     private int MarkEyes(boolean[][] markedPixels, int currentRow, int currentColumn)
@@ -159,7 +162,7 @@ public class DoodleFeature
                 if (isBlack && !isMarked)
                 {
                     markedPixels[columnIndex][rowIndex] = true;
-                    MarkNeighbours(markedPixels, rowIndex, columnIndex);
+                    MarkAllBlackNeighbours(markedPixels, rowIndex, columnIndex);
                     regionCount++;
                 }
             }
@@ -167,25 +170,33 @@ public class DoodleFeature
         return regionCount;
     }
 
-    private void CountCrosses()
+    private int CountDiagonalNeigbours(boolean[][] markedPixels, int currentRow, int currentColumn)
     {
-        boolean[][] markedPixels = new boolean[GRID_SIZE][GRID_SIZE];
-        int crossCount = 0;
-        for (int rowIndex = 0; rowIndex < data.length; rowIndex++)
+        int neighbourCount = 0;
+        for (int rowIndex = currentRow - 1; rowIndex <= (currentRow + 1); rowIndex++)
         {
-            for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++)
+            for (int columnIndex = currentColumn - 1; columnIndex <= (currentColumn + 1) ; columnIndex++)
             {
-                boolean isBlack = data[columnIndex][rowIndex] == 1;
-                boolean isMarked = markedPixels[columnIndex][rowIndex];
-                if (isBlack && !isMarked)
+                if (IsNeighbourValid(rowIndex, columnIndex))
                 {
+                    if (!IsNotDiagonalNeighbour(currentRow, currentColumn, rowIndex, columnIndex))
+                    {
+                        boolean isMarked = markedPixels[columnIndex][rowIndex];
+                        boolean isBlack = data[columnIndex][rowIndex] == 1;
+                        if (!isMarked && isBlack)
+                        {
+                            markedPixels[columnIndex][rowIndex] = true;
+                            neighbourCount++;
+                        }
+                    }
 
                 }
             }
         }
+        return neighbourCount;
     }
 
-    private void MarkNeighbours(boolean[][] markedPixels, int currentRow, int currentColumn)
+    private void MarkAllBlackNeighbours(boolean[][] markedPixels, int currentRow, int currentColumn)
     {
         for (int rowIndex = currentRow - 1; rowIndex <= (currentRow + 1); rowIndex++)
         {
@@ -197,14 +208,12 @@ public class DoodleFeature
                     if (!isMarked && data[columnIndex][rowIndex] == 1)
                     {
                         markedPixels[columnIndex][rowIndex] = true;
-                        MarkNeighbours(markedPixels, rowIndex, columnIndex);
+                        MarkAllBlackNeighbours(markedPixels, rowIndex, columnIndex);
                     }
                 }
             }
         }
     }
-
-
 
     private void CountTwoTiles()
     {

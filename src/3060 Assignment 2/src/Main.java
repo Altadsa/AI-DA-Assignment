@@ -19,8 +19,8 @@ public class Main {
     private static final int GRID_SIZE = 50;
 
     static final String FEATURES_HEADINGS = "label\tindex\tnr_pix\theight\twidth\tspan\trows_with_5\tcols_with_5\tneigh1\tneigh5"
-            + "\tleft2tile\tright2tile\tverticalness\ttop2tile\tbottom2tile\thorizontalness\tnewlabel1\tnewlabel2\tnr_regions\t"
-            + "nr_eyes\thollowness\tnewlabel3";
+            + "\tleft2tile\tright2tile\tverticalness\ttop2tile\tbottom2tile\thorizontalness\tnr_crosses\tnewlabel2\tnr_regions\t"
+            + "nr_eyes\thollowness\timage_fill";
 
     static ArrayList<DoodleFeature> _doodleFeatures = new ArrayList<>();
 
