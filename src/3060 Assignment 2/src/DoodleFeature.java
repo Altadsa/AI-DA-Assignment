@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public class DoodleFeature
 {
     final int GRID_SIZE = 50;
-    int[][] data = new int[GRID_SIZE][GRID_SIZE];
+    int[][] _data = new int[GRID_SIZE][GRID_SIZE];
     String _doodleFilepath;
 
     String _label = "";
@@ -29,7 +29,7 @@ public class DoodleFeature
         {
             for (int columnIndex = 0; columnIndex < csvData[rowIndex].length; columnIndex++)
             {
-                data[columnIndex][rowIndex] = csvData[columnIndex][rowIndex];
+                _data[columnIndex][rowIndex] = csvData[columnIndex][rowIndex];
             }
         }
         _doodleFilepath = filepath;
@@ -63,7 +63,7 @@ public class DoodleFeature
         features += CountRegions() + "\t";
         features += _nrEyes + "\t";
         features += _hollowness + "\t";
-        features += _imageFill + "\t";
+        features += _imageFill;
 
         return features;
     }
@@ -87,11 +87,11 @@ public class DoodleFeature
         boolean[][] markedPixels = new boolean[GRID_SIZE][GRID_SIZE];
         int eyeCount = 0;
         ArrayList<Integer> whiteInEyes = new ArrayList<>();
-        for (int rowIndex = 0; rowIndex < data.length; rowIndex++)
+        for (int rowIndex = 0; rowIndex < _data.length; rowIndex++)
         {
-            for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++)
+            for (int columnIndex = 0; columnIndex < _data[rowIndex].length; columnIndex++)
             {
-                boolean isWhite = data[columnIndex][rowIndex] == 0;
+                boolean isWhite = _data[columnIndex][rowIndex] == 0;
                 boolean isMarked = markedPixels[columnIndex][rowIndex];
                 if (isWhite && !isMarked)
                 {
@@ -124,13 +124,13 @@ public class DoodleFeature
                 if (IsNeighbourValid(rowIndex, columnIndex))
                 {
                     boolean isMarked = markedPixels[columnIndex][rowIndex];
-                    boolean isWhite = data[columnIndex][rowIndex] == 0;
+                    boolean isWhite = _data[columnIndex][rowIndex] == 0;
                     if (!isMarked && isWhite)
                     {
                         if (!IsNotDiagonalNeighbour(currentRow, currentColumn, rowIndex, columnIndex))
                         {
-                            int adjacentOne = data[currentColumn + (columnIndex - currentColumn)][currentRow];
-                            int adjacentTwo = data[currentColumn][currentRow + (rowIndex - currentRow)];
+                            int adjacentOne = _data[currentColumn + (columnIndex - currentColumn)][currentRow];
+                            int adjacentTwo = _data[currentColumn][currentRow + (rowIndex - currentRow)];
                             if (adjacentOne != 1 && adjacentTwo != 1)
                             {
                                 markedPixels[columnIndex][rowIndex] = true;
@@ -153,11 +153,11 @@ public class DoodleFeature
     {
         boolean[][] markedPixels = new boolean[GRID_SIZE][GRID_SIZE];
         int regionCount = 0;
-        for (int rowIndex = 0; rowIndex < data.length; rowIndex++)
+        for (int rowIndex = 0; rowIndex < _data.length; rowIndex++)
         {
-            for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++)
+            for (int columnIndex = 0; columnIndex < _data[rowIndex].length; columnIndex++)
             {
-                boolean isBlack = data[columnIndex][rowIndex] == 1;
+                boolean isBlack = _data[columnIndex][rowIndex] == 1;
                 boolean isMarked = markedPixels[columnIndex][rowIndex];
                 if (isBlack && !isMarked)
                 {
@@ -182,7 +182,7 @@ public class DoodleFeature
                     if (!IsNotDiagonalNeighbour(currentRow, currentColumn, rowIndex, columnIndex))
                     {
                         boolean isMarked = markedPixels[columnIndex][rowIndex];
-                        boolean isBlack = data[columnIndex][rowIndex] == 1;
+                        boolean isBlack = _data[columnIndex][rowIndex] == 1;
                         if (!isMarked && isBlack)
                         {
                             markedPixels[columnIndex][rowIndex] = true;
@@ -205,7 +205,7 @@ public class DoodleFeature
                 if (IsNeighbourValid(rowIndex, columnIndex))
                 {
                     boolean isMarked = markedPixels[columnIndex][rowIndex];
-                    if (!isMarked && data[columnIndex][rowIndex] == 1)
+                    if (!isMarked && _data[columnIndex][rowIndex] == 1)
                     {
                         markedPixels[columnIndex][rowIndex] = true;
                         MarkAllBlackNeighbours(markedPixels, rowIndex, columnIndex);
@@ -239,7 +239,7 @@ public class DoodleFeature
 
                             if (currentRow != selectedRow || currentColumn != selectedColumn)
                             {
-                                if (data[currentColumn][currentRow] == 1)
+                                if (_data[currentColumn][currentRow] == 1)
                                 {
                                     //Checks for start of Left/Right tile
                                     if (Math.abs(currentRow - selectedRow) == 1)
@@ -248,9 +248,9 @@ public class DoodleFeature
                                         boolean leftTileMarked = leftTiles[selectedColumn][selectedRow] && leftTiles[currentColumn][currentRow];
                                         if (IsNeighbourValid(selectedRow, selectedColumn + 1) && !leftTileMarked)
                                         {
-                                            if (data[selectedColumn+1][selectedRow] == 0 && IsNeighbourValid(currentRow, currentColumn + 1))
+                                            if (_data[selectedColumn+1][selectedRow] == 0 && IsNeighbourValid(currentRow, currentColumn + 1))
                                             {
-                                                if (data[currentColumn + 1][currentRow] == 0)
+                                                if (_data[currentColumn + 1][currentRow] == 0)
                                                 {
                                                     left2Tiles++;
                                                     leftTiles[selectedColumn][selectedRow] = true;
@@ -263,9 +263,9 @@ public class DoodleFeature
                                         boolean rightTileMarked = rightTiles[selectedColumn][selectedRow] && rightTiles[currentColumn][currentRow];
                                         if (IsNeighbourValid(selectedRow, selectedColumn - 1) && !rightTileMarked)
                                         {
-                                            if (data[selectedColumn - 1][selectedRow] == 0 && IsNeighbourValid(currentRow, currentColumn - 1))
+                                            if (_data[selectedColumn - 1][selectedRow] == 0 && IsNeighbourValid(currentRow, currentColumn - 1))
                                             {
-                                                if (data[currentColumn - 1][currentRow] == 0)
+                                                if (_data[currentColumn - 1][currentRow] == 0)
                                                 {
                                                     right2Tiles++;
                                                     rightTiles[selectedColumn][selectedRow] = true;
@@ -282,9 +282,9 @@ public class DoodleFeature
                                         boolean topTileMarked = topTiles[selectedColumn][selectedRow] && topTiles[currentColumn][currentRow];
                                         if (IsNeighbourValid(selectedRow + 1, selectedColumn) & !topTileMarked)
                                         {
-                                            if (data[selectedColumn][selectedRow + 1] == 0 && IsNeighbourValid(currentRow + 1, currentColumn))
+                                            if (_data[selectedColumn][selectedRow + 1] == 0 && IsNeighbourValid(currentRow + 1, currentColumn))
                                             {
-                                                if (data[currentColumn][currentRow + 1] == 0)
+                                                if (_data[currentColumn][currentRow + 1] == 0)
                                                 {
                                                     top2Tiles++;
                                                     topTiles[selectedColumn][selectedRow] = true;
@@ -297,9 +297,9 @@ public class DoodleFeature
                                         boolean bottomTileMarked = bottomTiles[selectedColumn][selectedRow] && bottomTiles[currentColumn][currentRow];
                                         if (IsNeighbourValid(selectedRow - 1, selectedColumn) && !bottomTileMarked)
                                         {
-                                            if (data[selectedColumn][selectedRow - 1] == 0 && IsNeighbourValid(currentRow - 1, currentColumn))
+                                            if (_data[selectedColumn][selectedRow - 1] == 0 && IsNeighbourValid(currentRow - 1, currentColumn))
                                             {
-                                                if (data[currentColumn][currentRow - 1] == 0)
+                                                if (_data[currentColumn][currentRow - 1] == 0)
                                                 {
                                                     bottom2Tile++;
                                                     bottomTiles[selectedColumn][selectedRow] = true;
@@ -364,7 +364,7 @@ public class DoodleFeature
                 {
                     if (rowIndex != currentRow || columnIndex != currentColumn)
                     {
-                        if (data[columnIndex][rowIndex] == 1)
+                        if (_data[columnIndex][rowIndex] == 1)
                             neighbourCount++;
                     }
                 }
@@ -390,7 +390,7 @@ public class DoodleFeature
             int blackPixelCount = 0;
             for (int columnIndex = 0; columnIndex < GRID_SIZE; columnIndex++)
             {
-                int pixelValue = data[rowIndex][columnIndex];
+                int pixelValue = _data[rowIndex][columnIndex];
                 if (pixelValue == 1) blackPixelCount++;
             }
             if (blackPixelCount >= 5) numberOfColumns++;
@@ -406,7 +406,7 @@ public class DoodleFeature
             int blackPixelCount = 0;
             for (int columnIndex = 0; columnIndex < GRID_SIZE; columnIndex++)
             {
-                int pixelValue = data[columnIndex][rowIndex];
+                int pixelValue = _data[columnIndex][rowIndex];
                 if (pixelValue == 1) blackPixelCount++;
             }
             if (blackPixelCount >= 5) numberOfRows++;
@@ -440,7 +440,7 @@ public class DoodleFeature
         {
             for (int columnIndex = 0; columnIndex < GRID_SIZE; columnIndex++)
             {
-                boolean isBlack = data[columnIndex][rowIndex] == 1;
+                boolean isBlack = _data[columnIndex][rowIndex] == 1;
                 if (isBlack)
                 {
                     blackPixelData.add(new int[] {rowIndex, columnIndex});
@@ -457,7 +457,7 @@ public class DoodleFeature
         {
             for (int j = 0; j < GRID_SIZE; j++)
             {
-                int pixelValue = data[j][i];
+                int pixelValue = _data[j][i];
                 if (pixelValue == 1)
                 {
                     leftmost = j < leftmost ? j : leftmost;
@@ -476,7 +476,7 @@ public class DoodleFeature
         {
             for (int j = 0; j < GRID_SIZE; j++)
             {
-                int pixelValue = data[j][i];
+                int pixelValue = _data[j][i];
                 if (pixelValue == 1)
                 {
                     topmost = (topmost >= 0) ? topmost : i;
@@ -494,7 +494,7 @@ public class DoodleFeature
         {
             for (int j = 0; j < GRID_SIZE; j++)
             {
-                if (data[j][i] == 1)
+                if (_data[j][i] == 1)
                     blackPixelCount++;
             }
         }

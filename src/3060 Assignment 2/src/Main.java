@@ -38,7 +38,7 @@ public class Main {
         String featuresName = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\40178464_features.csv";
         FileWriter fos = new FileWriter(featuresName);
         PrintWriter dos = new PrintWriter(fos);
-        dos.println(FEATURES_HEADINGS);
+        //dos.println(FEATURES_HEADINGS);
         for (int i = 0; i < _doodleFeatures.size(); i++)
         {
             dos.println(_doodleFeatures.get(i).GetDoodleFeatures());
