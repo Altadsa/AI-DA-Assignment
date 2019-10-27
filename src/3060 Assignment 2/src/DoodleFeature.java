@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -170,30 +171,38 @@ public class DoodleFeature
         return regionCount;
     }
 
-    private int CountDiagonalNeigbours(boolean[][] markedPixels, int currentRow, int currentColumn)
+    private void CountDiagonalTiles()
     {
-        int neighbourCount = 0;
-        for (int rowIndex = currentRow - 1; rowIndex <= (currentRow + 1); rowIndex++)
+        int leftDiagonalTile = 0, rightDiagonalTile = 0;
+        boolean[][] leftTiles = new boolean[GRID_SIZE][GRID_SIZE];
+        boolean[][] rightTiles = new boolean[GRID_SIZE][GRID_SIZE];
+        var blackPixels = GetBlackPixelIndexes();
+        for (int[] pixel : blackPixels)
         {
-            for (int columnIndex = currentColumn - 1; columnIndex <= (currentColumn + 1) ; columnIndex++)
+            int sRow = pixel[0], sColumn = pixel[1];
+            for (int currentRow = sRow - 1; currentRow <= sRow + 1; currentRow++)
             {
-                if (IsNeighbourValid(rowIndex, columnIndex))
+                for (int currentColumn = sColumn - 1; currentColumn <= sColumn + 1; currentColumn++)
                 {
-                    if (!IsNotDiagonalNeighbour(currentRow, currentColumn, rowIndex, columnIndex))
+                    if (!IsNotDiagonalNeighbour(sRow, sColumn,
+                            currentRow, currentColumn))
                     {
-                        boolean isMarked = markedPixels[columnIndex][rowIndex];
-                        boolean isBlack = _data[columnIndex][rowIndex] == 1;
-                        if (!isMarked && isBlack)
+                        if (IsNeighbourValid(currentRow, currentColumn))
                         {
-                            markedPixels[columnIndex][rowIndex] = true;
-                            neighbourCount++;
+                            if (currentRow != sRow || currentColumn != sColumn)
+                            {
+                                if (_data[currentColumn][currentRow] == 1)
+                                {
+                                    var rowDifference = sRow - currentRow;
+                                    var colDifference = sColumn - currentColumn;
+
+                                }
+                            }
                         }
                     }
-
                 }
             }
         }
-        return neighbourCount;
     }
 
     private void MarkAllBlackNeighbours(boolean[][] markedPixels, int currentRow, int currentColumn)
