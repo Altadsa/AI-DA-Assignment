@@ -21,6 +21,7 @@ public class DoodleFeature
     int _bottom2tile = 0;
     double _horizontalness = 0;
     int _horizontal3tile = 0;
+    int _vertical3tile = 0;
     int _nrEyes = 0;
     double _hollowness = 0;
     double _imageFill = 0;
@@ -28,17 +29,19 @@ public class DoodleFeature
     public DoodleFeature(int[][] csvData, String filepath)
     {
         for (int rowIndex = 0; rowIndex < csvData.length; rowIndex++)
+    {
+        for (int columnIndex = 0; columnIndex < csvData[rowIndex].length; columnIndex++)
         {
-            for (int columnIndex = 0; columnIndex < csvData[rowIndex].length; columnIndex++)
-            {
-                _data[columnIndex][rowIndex] = csvData[columnIndex][rowIndex];
-            }
+            _data[columnIndex][rowIndex] = csvData[columnIndex][rowIndex];
         }
-        _doodleFilepath = filepath;
-        GetDoodleName();
-        GetPixelNeighbours();
-        CountTwoTiles();
-        CountEyes();
+    }
+//        _doodleFilepath = filepath;
+//        GetDoodleName();
+//        GetPixelNeighbours();
+//        CountTwoTiles();
+//        CountHorizontalThreeTiles();
+//        CountVerticalThreeTiles();
+//        CountEyes();
     }
 
     public String GetDoodleFeatures()
@@ -61,7 +64,7 @@ public class DoodleFeature
         features += _bottom2tile + "\t";
         features += _horizontalness + "\t";
         features += _horizontal3tile + "\t";
-        features += "insert_feature\t";
+        features += _vertical3tile + "\t";
         features += CountRegions() + "\t";
         features += _nrEyes + "\t";
         features += _hollowness + "\t";
@@ -172,41 +175,7 @@ public class DoodleFeature
         return regionCount;
     }
 
-    private void CountDiagonalTiles()
-    {
-        int leftDiagonalTile = 0, rightDiagonalTile = 0;
-        boolean[][] leftTiles = new boolean[GRID_SIZE][GRID_SIZE];
-        boolean[][] rightTiles = new boolean[GRID_SIZE][GRID_SIZE];
-        var blackPixels = GetBlackPixelIndexes();
-        for (int[] pixel : blackPixels)
-        {
-            int sRow = pixel[0], sColumn = pixel[1];
-            for (int currentRow = sRow - 1; currentRow <= sRow + 1; currentRow++)
-            {
-                for (int currentColumn = sColumn - 1; currentColumn <= sColumn + 1; currentColumn++)
-                {
-                    if (!IsNotDiagonalNeighbour(sRow, sColumn,
-                            currentRow, currentColumn))
-                    {
-                        if (IsNeighbourValid(currentRow, currentColumn))
-                        {
-                            if (currentRow != sRow || currentColumn != sColumn)
-                            {
-                                if (_data[currentColumn][currentRow] == 1)
-                                {
-                                    var rowDifference = sRow - currentRow;
-                                    var colDifference = sColumn - currentColumn;
-
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public void CountThreeTiles()
+    public void CountHorizontalThreeTiles()
     {
         int horizontal3tiles = 0;
         List<int[]> blackPixels = GetBlackPixelIndexes();
@@ -237,7 +206,7 @@ public class DoodleFeature
                 //Indicates if any of the adjacent neighbours are invalid i.e. white/out of bounds
                 boolean isNeighbourValid = false;
                 rowloop:
-                for (int rowIndex = selectedRow-1; rowIndex <= selectedRow-1; rowIndex++)
+                for (int rowIndex = selectedRow-1; rowIndex <= selectedRow + 1; rowIndex++)
                 {
                     for (int columnIndex = selectedColumn-1; columnIndex <= selectedColumn + 1; columnIndex++)
                     {
@@ -271,6 +240,73 @@ public class DoodleFeature
         }
         System.out.println("horizontal3tile: " + horizontal3tiles);
         _horizontal3tile = horizontal3tiles;
+    }
+
+    public void CountVerticalThreeTiles()
+    {
+        int verticalThreeTiles = 0;
+        List<int[]> blackPixels = GetBlackPixelIndexes();
+        boolean[][] markedVerticlTiles = new boolean[GRID_SIZE][GRID_SIZE];
+        int selectedRow = 0, selectedColumn = 0;
+
+        //Loop through all the black pixels
+        for (int[] pixel : blackPixels)
+        {
+            selectedRow = pixel[0];
+            selectedColumn = pixel[1];
+
+            //Check for a vertical 3tile
+            boolean isTopValid = IsNeighbourValid(selectedRow - 1, selectedColumn);
+            boolean isBottomValid = IsNeighbourValid(selectedRow + 1, selectedColumn);
+            if (isTopValid && isBottomValid)
+            {
+                //Check if adjacent neighbours are black
+                if (_data[selectedColumn][selectedRow-1] == 0 || _data[selectedColumn][selectedRow + 1] == 0)
+                    continue;
+                //Checks if the three black tiles are already marked
+                if (markedVerticlTiles[selectedColumn][selectedRow]
+                        || markedVerticlTiles[selectedColumn][selectedRow - 1]
+                        || markedVerticlTiles[selectedColumn][selectedRow + 1])
+                {
+                    continue;
+                }
+                //Indicates if any of the adjacent neighbours are invalid i.e. white/out of bounds
+                boolean isNeighbourValid = false;
+                rowloop:
+                for (int rowIndex = selectedRow-1; rowIndex <= selectedRow + 1; rowIndex++)
+                {
+                    for (int columnIndex = selectedColumn-1; columnIndex <= selectedColumn + 1; columnIndex++)
+                    {
+                        boolean isSelectedPixel = selectedColumn == columnIndex;
+                        if (!isSelectedPixel)
+                        {
+                            if (!IsNeighbourValid(rowIndex, columnIndex))
+                            {
+                                isNeighbourValid = false;
+                                break rowloop;
+                            }
+                            if (_data[columnIndex][rowIndex] == 1)
+                            {
+                                isNeighbourValid = false;
+                                break rowloop;
+                            }
+                            isNeighbourValid = true;
+                        }
+                    }
+                }
+                if (isNeighbourValid)
+                {
+                    verticalThreeTiles++;
+                    for (int rowIndex = selectedRow - 1; rowIndex <= selectedRow + 1; rowIndex++)
+                    {
+                        markedVerticlTiles[selectedColumn][rowIndex] = true;
+                    }
+                }
+            }
+
+        }
+        System.out.println("vertical3tile: " + verticalThreeTiles);
+        _vertical3tile = verticalThreeTiles;
     }
 
     private void MarkAllBlackNeighbours(boolean[][] markedPixels, int currentRow, int currentColumn)

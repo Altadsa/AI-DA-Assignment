@@ -34,7 +34,8 @@ public class Main {
         //int[][] csvData =  LoadCsvData(_csvPath);
         //CountEyes(csvData);
         DoodleFeature d = new DoodleFeature(LoadCsvData(_testPath), "hello");
-        d.CountThreeTiles();
+        d.CountHorizontalThreeTiles();
+        d.CountVerticalThreeTiles();
     }
 
     private static void WriteFeaturesToFile() throws IOException {
