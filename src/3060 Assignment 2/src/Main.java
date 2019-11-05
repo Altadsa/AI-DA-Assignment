@@ -16,6 +16,7 @@ public class Main {
 
     static String _imgPath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\Doodles\\";
     static String _csvFilePath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\CSV\\";
+    static String _testPath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\TestDirectory\\40178464_Test_02.csv";
     private static final int GRID_SIZE = 50;
 
     static final String FEATURES_HEADINGS = "label\tindex\tnr_pix\theight\twidth\tspan\trows_with_5\tcols_with_5\tneigh1\tneigh5"
@@ -26,12 +27,14 @@ public class Main {
 
     public static void main(String[] args) throws IOException
     {
-        LoadFeatures();
-        WriteFeaturesToFile();
+//        LoadFeatures();
+//        WriteFeaturesToFile();
         //ConvertToCsv(_testPath);
         //System.out.println("Enter the CSV Directory: ");
         //int[][] csvData =  LoadCsvData(_csvPath);
         //CountEyes(csvData);
+        DoodleFeature d = new DoodleFeature(LoadCsvData(_testPath), "hello");
+        d.CountThreeTiles();
     }
 
     private static void WriteFeaturesToFile() throws IOException {

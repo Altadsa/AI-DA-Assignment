@@ -88,6 +88,8 @@
       <workItem from="1571236208623" duration="889000" />
       <workItem from="1571306194362" duration="734000" />
       <workItem from="1571310979388" duration="3160000" />
+      <workItem from="1572892716539" duration="3224000" />
+      <workItem from="1572987656527" duration="4613000" />
     </task>
     <servers />
   </component>
@@ -108,6 +110,15 @@
     </option>
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/DoodleFeature.java</url>
+          <line>207</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="blackPixels" />

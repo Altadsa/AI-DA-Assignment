@@ -19,6 +19,7 @@ public class DoodleFeature
     int _top2tile = 0;
     int _bottom2tile = 0;
     double _horizontalness = 0;
+    int _horizontal3tile = 0;
     int _nrEyes = 0;
     double _hollowness = 0;
     double _imageFill = 0;
@@ -58,7 +59,7 @@ public class DoodleFeature
         features += _top2tile + "\t";
         features += _bottom2tile + "\t";
         features += _horizontalness + "\t";
-        features += "insert_feature\t";
+        features += _horizontal3tile + "\t";
         features += "insert_feature\t";
         features += CountRegions() + "\t";
         features += _nrEyes + "\t";
@@ -194,6 +195,73 @@ public class DoodleFeature
             }
         }
         return neighbourCount;
+    }
+
+    public void CountThreeTiles()
+    {
+        int horizontal3tiles = 0;
+        List<int[]> blackPixels = GetBlackPixelIndexes();
+        boolean[][] markedTopTiles = new boolean[GRID_SIZE][GRID_SIZE];
+        int selectedRow = 0, selectedColumn = 0;
+
+        //Loop through all the black pixels
+        for (int[] pixel : blackPixels)
+        {
+            selectedRow = pixel[0];
+            selectedColumn = pixel[1];
+
+            //Check for a horizontal 3tile
+            boolean isLeftValid = IsNeighbourValid(selectedRow, selectedColumn-1);
+            boolean isRightValud = IsNeighbourValid(selectedRow, selectedColumn+1);
+            if (isLeftValid && isRightValud)
+            {
+                //Check if adjacent neighbours are black
+                if (_data[selectedColumn-1][selectedRow] == 0 || _data[selectedColumn+1][selectedRow] == 0)
+                    continue;
+                //Checks if the three black tiles are already marked
+                if (markedTopTiles[selectedColumn][selectedRow]
+                        || markedTopTiles[selectedColumn-1][selectedRow]
+                        || markedTopTiles[selectedColumn+1][selectedRow])
+                {
+                    continue;
+                }
+                //Indicates if any of the adjacent neighbours are invalid i.e. white/out of bounds
+                boolean isNeighbourValid = false;
+                rowloop:
+                for (int rowIndex = selectedRow-1; rowIndex <= selectedRow-1; rowIndex++)
+                {
+                    for (int columnIndex = selectedColumn-1; columnIndex <= selectedColumn + 1; columnIndex++)
+                    {
+                        boolean isSelectedPixel = rowIndex == selectedRow;
+                        if (!isSelectedPixel)
+                        {
+                            if (!IsNeighbourValid(rowIndex, columnIndex))
+                            {
+                                isNeighbourValid = false;
+                                break rowloop;
+                            }
+                            if (_data[columnIndex][rowIndex] == 1)
+                            {
+                                isNeighbourValid = false;
+                                break rowloop;
+                            }
+                            isNeighbourValid = true;
+                        }
+                    }
+                }
+                if (isNeighbourValid)
+                {
+                    horizontal3tiles++;
+                    for (int columnIndex = selectedColumn - 1; columnIndex <= selectedColumn + 1; columnIndex++)
+                    {
+                        markedTopTiles[columnIndex][selectedRow] = true;
+                    }
+                }
+            }
+
+        }
+        System.out.println("horizontal3tile: " + horizontal3tiles);
+        _horizontal3tile = horizontal3tiles;
     }
 
     private void MarkAllBlackNeighbours(boolean[][] markedPixels, int currentRow, int currentColumn)
@@ -343,9 +411,12 @@ public class DoodleFeature
         {
             for (int columnIndex = 0; columnIndex < GRID_SIZE; columnIndex++)
             {
-                int neighbours = CountNeighbours(rowIndex, columnIndex);
-                if (neighbours == 1) pixelsWithOneNeighbour++;
-                if (neighbours >= 5) pixelsWithFiveNeighbours++;
+                if (_data[columnIndex][rowIndex] == 1)
+                {
+                    int neighbours = CountNeighbours(rowIndex, columnIndex);
+                    if (neighbours == 1) pixelsWithOneNeighbour++;
+                    if (neighbours >= 5) pixelsWithFiveNeighbours++;
+                }
             }
         }
 
