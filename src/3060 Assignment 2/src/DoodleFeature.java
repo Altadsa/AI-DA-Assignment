@@ -35,13 +35,13 @@ public class DoodleFeature
             _data[columnIndex][rowIndex] = csvData[columnIndex][rowIndex];
         }
     }
-//        _doodleFilepath = filepath;
-//        GetDoodleName();
-//        GetPixelNeighbours();
-//        CountTwoTiles();
-//        CountHorizontalThreeTiles();
-//        CountVerticalThreeTiles();
-//        CountEyes();
+        _doodleFilepath = filepath;
+        GetDoodleName();
+        GetPixelNeighbours();
+        CountTwoTiles();
+        CountHorizontalThreeTiles();
+        CountVerticalThreeTiles();
+        CountEyes();
     }
 
     public String GetDoodleFeatures()
@@ -238,7 +238,6 @@ public class DoodleFeature
             }
 
         }
-        System.out.println("horizontal3tile: " + horizontal3tiles);
         _horizontal3tile = horizontal3tiles;
     }
 
@@ -305,7 +304,6 @@ public class DoodleFeature
             }
 
         }
-        System.out.println("vertical3tile: " + verticalThreeTiles);
         _vertical3tile = verticalThreeTiles;
     }
 

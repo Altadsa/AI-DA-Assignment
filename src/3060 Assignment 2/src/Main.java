@@ -27,15 +27,12 @@ public class Main {
 
     public static void main(String[] args) throws IOException
     {
-//        LoadFeatures();
-//        WriteFeaturesToFile();
+        LoadFeatures();
+        WriteFeaturesToFile();
         //ConvertToCsv(_testPath);
         //System.out.println("Enter the CSV Directory: ");
         //int[][] csvData =  LoadCsvData(_csvPath);
         //CountEyes(csvData);
-        DoodleFeature d = new DoodleFeature(LoadCsvData(_testPath), "hello");
-        d.CountHorizontalThreeTiles();
-        d.CountVerticalThreeTiles();
     }
 
     private static void WriteFeaturesToFile() throws IOException {
