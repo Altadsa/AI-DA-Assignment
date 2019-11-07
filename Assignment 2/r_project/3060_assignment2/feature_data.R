@@ -4,7 +4,7 @@ feature_col_names <- c("label", "index", "nr_pix", "height", "width", "span", "r
                        "left2tile", "right2tile", "verticalness", "top2tile", "bottom2tile", "horizontalness", "3tile1", "3tile2", 
                        "nr_regions", "nr_eyes", "hollowness", "image_fill")
 
-feature_data <- read.csv(filepath, header = FALSE, sep = "\t", col.names = feature_col_names)
+feature_data <- read.csv(filepath, header = TRUE, sep = "\t", col.names = feature_col_names)
 
 
 #Get the Feature Data for Living Things
@@ -33,10 +33,11 @@ hist(feature_data$nr_pix, main = "Entire Set - No. of Pixels")
 hist(feature_data$height, main = "Entire Set - Height")
 hist(feature_data$cols_with_5, main = "Entire Set - Columns with 5+")
 
-#2. 
+#2. Summary Statistics
+
+
 
 #3. Plot theoretical Normal Distribution for nr_pix
-mean_nr_pix <- mean(feature_data$nr_pix)
 variance_nr_pix <- var(feature_data$nr_pix)
 plotx_nr_pix <- seq(0, 250, 25)
 pnorm_nr_pix <- dnorm(plotx_nr_pix, mean_nr_pix, sqrt(variance_nr_pix))

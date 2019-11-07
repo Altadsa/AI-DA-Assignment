@@ -19,7 +19,7 @@ public class Main {
     static String _testPath = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\TestDirectory\\40178464_Test_02.csv";
     private static final int GRID_SIZE = 50;
 
-    static final String FEATURES_HEADINGS = "label\tindex\tnr_pix\theight\twidth\tspan\trows_with_5\tcols_with_5\tneigh1\tneigh5"
+    static final String FEATURES_HEADINGS = "LABEL\tINDEX\tnr_pix\theight\twidth\tspan\trows_with_5\tcols_with_5\tneigh1\tneigh5"
             + "\tleft2tile\tright2tile\tverticalness\ttop2tile\tbottom2tile\thorizontalness\tnr_crosses\tnewlabel2\tnr_regions\t"
             + "nr_eyes\thollowness\timage_fill";
 
@@ -29,17 +29,13 @@ public class Main {
     {
         LoadFeatures();
         WriteFeaturesToFile();
-        //ConvertToCsv(_testPath);
-        //System.out.println("Enter the CSV Directory: ");
-        //int[][] csvData =  LoadCsvData(_csvPath);
-        //CountEyes(csvData);
     }
 
     private static void WriteFeaturesToFile() throws IOException {
         String featuresName = "C:\\Users\\spark\\Documents\\AI-DA-Assignment\\Assignment 2\\40178464_features.csv";
         FileWriter fos = new FileWriter(featuresName);
         PrintWriter dos = new PrintWriter(fos);
-        //dos.println(FEATURES_HEADINGS);
+        dos.println(FEATURES_HEADINGS);
         for (int i = 0; i < _doodleFeatures.size(); i++)
         {
             dos.println(_doodleFeatures.get(i).GetDoodleFeatures());

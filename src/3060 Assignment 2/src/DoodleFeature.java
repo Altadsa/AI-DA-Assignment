@@ -115,8 +115,9 @@ public class DoodleFeature
         {
             whitePixelCount += whiteInEyes.get(i);
         }
-        _hollowness = (double) whitePixelCount / NumberOfPixels();
-        _imageFill = (double) (whitePixelCount + NumberOfPixels()) / unusedArea;
+        int pixelCount = NumberOfPixels();
+        _hollowness = (double) whitePixelCount / pixelCount;
+        _imageFill = (double) (whitePixelCount + pixelCount) / (unusedArea + whitePixelCount + pixelCount);
     }
 
     private int MarkEyes(boolean[][] markedPixels, int currentRow, int currentColumn)
