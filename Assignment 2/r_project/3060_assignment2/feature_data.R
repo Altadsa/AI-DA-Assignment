@@ -257,7 +257,7 @@ pf(414.2, df1 = 3, df2 = 76)
 
 nr_randomizations <- 10000
 anova_results <- rep(0, nr_randomizations)
-for (ii in 1:1)
+for (ii in 1:nr_randomizations)
 {
   start_group <- 1
   end_group <- 20
@@ -274,9 +274,12 @@ for (ii in 1:1)
   
 }
 
+
+
 plotNormalHistogram(anova_results,
                     main = "Normal Histogram of random F statisitics",
                     xlab = "F-value")
+abline(v = qnorm(0.999999999999999, mean(anova_results), sd(anova_results)), col = "red", lwd = 4)
 hollowness_aov <- aov(hollowness ~ label, data = nonliving_thing_data)
 actual_f <- summary(hollowness_aov)[[1]]$F[1]
 pf(mean(anova_results), df1 = 3, df2 = 76)
@@ -284,17 +287,25 @@ plotNormalHistogram(nonliving_thing_data$hollowness,
                     main = "Normal Histogram for hollowness of nonliving things",
                     xlab = "hollowness")
 
-result <- pairwise.t.test(nonliving_thing_data$hollowness, nonliving_thing_data$label, data=nonliving_thing_data,
-                          p.adjust.method = "bonferroni")
-result$p.value
+print(sprintf("Average F-Value from %s tests: %s", nr_randomizations, mean(anova_results)))
+print(sprintf("Actual F-Value from non-randomized results %s", actual_f))
 
 #9.
 
-test_table <- data.frame("feature" = colnames(feature_data)[3:22], "t_value" = 0)
-for (i in 3:22)
+test_table <- data.frame("feature" = colnames(feature_data)[3:22],
+                         "mean_living" = 0, 
+                         "mean_nonliving" = 0,
+                         "diff_in_means" = 0,
+                         "t_value" = 0)
+for (i in 1:nrow(test_table))
 {
-  t_test <- t.test(living_thing_data[[i]], nonliving_thing_data[[i]])
-  rbind(test_table, "feature" = colnames(living_thing_data[i]), "t_value" = t_test$statistic)
+  living <- living_thing_data[[i+2]]
+  nonliving <- nonliving_thing_data[[i+2]]
+  t_test <- t.test(living, nonliving)
+  test_table[i,2] = mean(living)
+  test_table[i,3] = mean(nonliving)
+  test_table[i,4] = mean(living) - mean(nonliving)
+  test_table[i,5] = t_test$statistic
 }
 
 t <- t.test(living_thing_data$hollowness, nonliving_thing_data$hollowness)
@@ -324,6 +335,10 @@ f_table$F_value <- f_values
 feature_name <- nonliving_thing_data[[highest_index]]
 summary(aov(feature_name ~ label, data = nonliving_thing_data))
 p_value <- 1 - pf(highest_f, 3, 76)
+
+ggboxplot(nonliving_thing_data, x = "label", y = "rows_wth_5",
+          color = "label", palette = c("#0000FF", "#00FF00", "#FF0000", "#FF00FF"),
+          ylab = "Pixel Count", xlab = "Object")
 
 pair_t_results <- pairwise.t.test(nonliving_thing_data[[highest_index]], nonliving_thing_data$label, data = nonliving_thing_data,
                 p.adjust.method = "bonferroni")
